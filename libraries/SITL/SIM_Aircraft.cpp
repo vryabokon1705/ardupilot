@@ -34,6 +34,8 @@
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_HAL_SITL/HAL_SITL_Class.h>
 
+#include "SIM_TMotorDataLink.h"
+
 using namespace SITL;
 
 extern const AP_HAL::HAL& hal;
@@ -1078,6 +1080,16 @@ void Aircraft::update_external_payload(const struct sitl_input &input)
     if (fetteconewireesc) {
         fetteconewireesc->update(*this);
     }
+
+    for (auto &esc : hwing_escs) {
+        esc.update(*this, input);
+    }
+
+#if AP_SIM_TMOTOR_DATALINK_ENABLED
+    if (tmotordatalink != nullptr) {
+        tmotordatalink->update(*this, input);
+    }
+#endif
 
 #if AP_SIM_SHIP_ENABLED
     sitl->models.shipsim.update();
